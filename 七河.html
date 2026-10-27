@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+<meta name="description" content="江门市七条重点河道与入海水系互动展示（示意版）" />
+<title>江门七河入海水系展示平台</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+<style>
+:root{--navy:#10283f;--navy2:#173c56;--teal:#00a99d;--blue:#2878b9;--cyan:#7be0d7;--ink:#1b3448;--muted:#6f8596;--line:#dce7ee;--paper:#f4f8fb;--white:#fff;--amber:#fff3d8;--amberink:#80510d;}
+*{box-sizing:border-box}html,body{margin:0;height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);background:var(--paper)}
+button,input,textarea{font:inherit}button{cursor:pointer}
+.app{min-height:100%;display:flex;flex-direction:column}.topbar{background:linear-gradient(115deg,var(--navy),#174d68);color:#fff;padding:18px clamp(16px,3vw,34px) 16px;box-shadow:0 5px 18px #0d24371c;position:relative;z-index:500}
+.topline{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}.brand{display:flex;align-items:center;gap:13px}.logo{width:44px;height:44px;border:1px solid #70d8d0;border-radius:14px;display:grid;place-items:center;background:#ffffff10;font-size:25px}.title{font-size:clamp(20px,2.2vw,28px);font-weight:760;letter-spacing:.3px}.subtitle{font-size:12px;color:#c7e1e9;margin-top:5px;letter-spacing:.8px}.header-tag{padding:7px 11px;border:1px solid #77cfc7;border-radius:20px;color:#c7fff5;font-size:12px;white-space:nowrap}.metrics{display:flex;gap:9px;margin-top:16px;flex-wrap:wrap}.metric{border:1px solid #ffffff24;border-radius:11px;background:#ffffff0b;padding:8px 12px;min-width:118px}.metric strong{font-size:18px;color:#70e0d4;margin-right:6px}.metric span{font-size:12px;color:#d5e6ec}
+.main{width:100%;max-width:1600px;margin:0 auto;padding:16px;display:grid;grid-template-columns:minmax(0,1.65fr) minmax(320px,.8fr);gap:16px;flex:1;min-height:650px}.map-card,.side-card{background:var(--white);border:1px solid var(--line);border-radius:18px;box-shadow:0 6px 25px #17384c0b;overflow:hidden}.map-card{display:flex;flex-direction:column;min-height:600px}.map-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 16px;border-bottom:1px solid var(--line)}.section-title{font-weight:750;font-size:15px;display:flex;align-items:center;gap:8px}.section-title:before{content:"";width:4px;height:18px;border-radius:4px;background:var(--teal);display:inline-block}.controls{display:flex;gap:7px;flex-wrap:wrap}.btn{border:1px solid #d3e1e8;background:#fff;color:#31536a;padding:8px 11px;border-radius:9px;font-size:12px;font-weight:650;transition:.15s}.btn:hover{border-color:#6bcac0;color:#087e78}.btn.primary{background:var(--teal);color:#fff;border-color:var(--teal)}.btn.dark{background:var(--navy2);color:#fff;border-color:var(--navy2)}.mapwrap{position:relative;flex:1;min-height:470px;background:#dfeef0}.map{height:100%;min-height:470px;width:100%;z-index:1}.map-label{position:absolute;z-index:400;left:14px;top:14px;background:#10283fe8;color:#fff;border-radius:10px;padding:10px 12px;box-shadow:0 4px 14px #09243b25;max-width:250px;pointer-events:none}.map-label strong{font-size:13px;display:block;margin-bottom:4px}.map-label span{font-size:11px;color:#d4e6eb;line-height:1.5;display:block}.map-footer{padding:10px 15px;border-top:1px solid var(--line);font-size:11px;color:var(--muted);display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}.legend{display:flex;gap:13px;flex-wrap:wrap}.leg{display:flex;gap:6px;align-items:center}.line-swatch{height:4px;width:20px;background:#08a99d;border-radius:3px}.line-swatch.mainriver{background:#1c79be}.line-swatch.route{background:#e5a23e}
+.side{display:flex;flex-direction:column;gap:14px;min-width:0}.side-card{padding:16px}.sidehead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px}.count{font-size:11px;background:#e8f7f5;color:#087d75;border-radius:30px;padding:5px 8px;font-weight:700}.river-list{display:flex;flex-direction:column;gap:7px}.river{display:flex;align-items:center;gap:10px;padding:10px;border-radius:11px;border:1px solid #e5edf2;background:#fff;text-align:left;color:var(--ink);width:100%;min-height:51px;transition:.15s}.river:hover{border-color:#8bd8d0;background:#f6fcfb}.river.active{background:#eaf8f6;border-color:#40bdb2;box-shadow:inset 3px 0 var(--teal)}.river-dot{width:10px;height:10px;flex:0 0 10px;border-radius:50%;box-shadow:0 0 0 4px #12a99d15}.river-info{flex:1;min-width:0}.river-name{font-size:13px;font-weight:750}.river-sub{font-size:10px;color:var(--muted);margin-top:4px;line-height:1.3}.chevron{font-size:17px;color:#90a7b6}.detail-title{font-size:18px;font-weight:800;margin-bottom:5px}.detail-sub{font-size:12px;color:var(--muted);line-height:1.55}.routeflow{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:13px 0}.flow-chip{background:#edf5f9;border:1px solid #dce9f0;border-radius:8px;padding:7px 9px;font-size:11px;color:#35546b;font-weight:700}.flow-arrow{color:var(--teal);font-weight:900}.note{padding:10px 11px;border-radius:10px;background:#f1f8fa;font-size:12px;color:#466475;line-height:1.7}.warning{background:var(--amber);color:var(--amberink);border:1px solid #f1ddb0;padding:10px 11px;border-radius:10px;font-size:11px;line-height:1.65;margin-top:10px}.sources{font-size:11px;color:var(--muted);line-height:1.7}.sources a{color:#177f91;text-decoration:none}.sources a:hover{text-decoration:underline}.tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.editor{width:100%;height:150px;border:1px solid #cadbe4;border-radius:10px;padding:10px;font:11px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace;color:#18394b;resize:vertical;background:#f8fbfd}.editor-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}.hidden{display:none!important}.file-input{display:block!important;max-width:170px;width:100%;font-size:11px;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:8px;padding:5px;min-height:34px}.toast{position:fixed;z-index:1200;bottom:20px;left:50%;transform:translateX(-50%);background:#112d43;color:white;padding:11px 16px;border-radius:10px;box-shadow:0 5px 22px #10283f35;font-size:12px;max-width:90vw}.leaflet-popup-content{font-family:inherit;line-height:1.65}.leaflet-popup-content b{font-size:14px}.leaflet-tooltip{font-weight:750;border-radius:7px;box-shadow:0 2px 9px #17384c26}.sea-label{background:#167da5;color:#fff;border:0;border-radius:7px;font-size:11px;font-weight:800;padding:5px 8px;box-shadow:0 2px 8px #17384c30}.leaflet-control-attribution{font-size:9px!important}
+@media(max-width:980px){.main{grid-template-columns:1fr;min-height:auto}.map-card{min-height:560px}.mapwrap,.map{min-height:430px}.side{display:grid;grid-template-columns:1fr;}.river-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.river{padding:9px}.topbar{padding-top:15px}}
+@media(max-width:480px){.main{padding:9px;gap:10px}.topbar{padding:14px}.metric{min-width:0;flex:1;padding:7px 8px}.metric strong{font-size:16px}.map-head{padding:12px}.map-head .controls{width:100%}.map-head .btn{flex:1}.mapwrap,.map{min-height:390px}.map-card{min-height:490px}.river-list{gap:6px}.river{min-height:55px}.river-sub{font-size:9px}.side-card{padding:13px}.map-label{max-width:200px;left:9px;top:9px}.header-tag{display:none}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="topbar">
+  <div class="topline">
+    <div class="brand"><div class="logo">🌊</div><div><div class="title">江门七河入海水系展示平台</div><div class="subtitle">JIANGMEN RIVER BASIN · INTERACTIVE MAP</div></div></div>
+    <div class="header-tag">V5.0 · GIS 数据检索与汇报版</div>
+  </div>
+  <div class="metrics">
+    <div class="metric"><strong>07</strong><span>重点河道</span></div>
+    <div class="metric"><strong>GIS</strong><span>支持导入官方河线</span></div>
+    <div class="metric"><strong>0</strong><span>预置虚构坐标线</span></div>
+  </div>
+</header>
+<main class="main">
+  <section class="map-card">
+    <div class="map-head"><div class="section-title">广东省底图 · 江门水系图层</div><div class="controls"><button class="btn" id="provinceBtn">广东省总览</button><button class="btn primary" id="jiangmenBtn">定位江门</button><button class="btn" id="allBtn">显示七河</button><button class="btn" id="hideBtn">隐藏河线</button></div></div>
+    <div style="padding:10px 14px;border-bottom:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <span style="font-size:11px;color:var(--muted);font-weight:700">GIS 数据：</span>
+      <button class="btn primary" id="loadOsmBtn">检索公开 OSM 河道</button>
+      <button class="btn" id="importRiverBtn">导入河道中心线</button>
+      <button class="btn" id="importBoundaryBtn">导入行政边界</button>
+      <button class="btn" id="importMouthBtn">导入入海口/汇入口</button>
+      <button class="btn" id="clearImportedBtn">清除导入图层</button>
+      <label style="font-size:11px;display:flex;align-items:center;gap:5px"><input type="checkbox" id="toggleRiverLabels" checked>河道名称</label>
+      <label style="font-size:11px;display:flex;align-items:center;gap:5px"><input type="checkbox" id="toggleBoundaries" checked>行政边界</label>
+      <label style="font-size:11px;display:flex;align-items:center;gap:5px"><input type="checkbox" id="toggleMouths" checked>河口点位</label>
+      <input id="riverFile" type="file" accept=".geojson,.json,application/geo+json,application/json" class="file-input" aria-label="选择河道 GeoJSON 文件">
+      <input id="boundaryFile" type="file" accept=".geojson,.json,application/geo+json,application/json" class="file-input" aria-label="选择行政边界 GeoJSON 文件">
+      <input id="mouthFile" type="file" accept=".geojson,.json,application/geo+json,application/json" class="file-input" aria-label="选择河口点位 GeoJSON 文件">
+    </div>
+    <div class="mapwrap"><div id="map" class="map" aria-label="广东省及江门市七条河道交互地图"></div><div class="map-label"><strong>江门市七条重点河道与下游水系</strong><span>选择河道查看官方资料。只有导入已核验 GIS 数据后才绘制精确河线；底图边界与水系为 OpenStreetMap 图层。</span></div></div>
+    <div class="map-footer"><div class="legend"><span class="leg"><i class="line-swatch"></i>导入的河道中心线</span><span class="leg"><i class="line-swatch mainriver"></i>底图水系 / 行政边界</span><span class="leg"><i class="line-swatch route"></i>经官方资料确认的入海口</span></div><span>底图 © OpenStreetMap 贡献者</span></div>
+  </section>
+  <aside class="side">
+    <section class="side-card">
+      <div class="sidehead"><div class="section-title">七条重点河道</div><span class="count" id="activeCount">7 条可选</span></div>
+      <div class="river-list" id="riverList"></div>
+    </section>
+    <section class="side-card" id="detailCard">
+      <div class="section-title" style="margin-bottom:13px">河道信息</div>
+      <div class="detail-title" id="detailTitle">天沙河</div>
+      <div class="detail-sub" id="detailSub">位于江门市区西北面，水系通过江门水道连接下游水网。</div>
+      <div class="routeflow" id="routeFlow"></div>
+      <div class="note" id="detailNote"></div>
+      <div class="warning">重要说明：官方文件将这七条河流列为重点综合治理支流，并非认定为七个彼此独立的直接入海口。本版本已移除未经核验的手工河线坐标，不将示意线伪装成真实河道。地图底图中的河流和行政边界来自 OpenStreetMap，非政府测绘成果；入海口仅在导入并核实官方坐标后添加。请勿将本平台用于工程设计或执法测绘。</div>
+    </section>
+    <section class="side-card">
+      <div class="sidehead"><div class="section-title">数据来源与修改</div></div>
+      <div class="sources">七条重点治理河道名单参考江门市水利局公开文件。公开检索可尝试从 OpenStreetMap Overpass 获取已标注的河道要素；OSM 数据不等于政府测绘成果，可能缺漏或名称不一致。当前版本不预置未经核验的河道坐标。<br><a href="https://www.jiangmen.gov.cn/bmpd/jmsslj/zwgk/zcyjd/content/post_2880254.html" target="_blank" rel="noopener">① 江门市2023年河湖长制工作要点：七条重点支流</a><br><a href="https://www.jiangmen.gov.cn/jmslj/gkmlpt/content/3/3526/post_3526717.html" target="_blank" rel="noopener">② 江门市级河湖长名单（2026年）</a><br><a href="https://www.jiangmen.gov.cn/bmpd/jmsslj/qmtxhczzt/hhgk/content/post_902822.html" target="_blank" rel="noopener">③ 天沙河：汇入江门水道的官方说明</a><br><a href="https://www.jiangmen.gov.cn/bmpd/jmsslj/qmtxhczzt/hhgk/content/post_902820.html" target="_blank" rel="noopener">④ 镇海水：汇入潭江的官方说明</a><br><a href="https://www.jiangmen.gov.cn/bmpd/jmsslj/qmtxhczzt/hhgk/content/post_902832.html" target="_blank" rel="noopener">⑤ 江门水道：连接西江与银洲湖的官方说明</a><br><a href="https://data.humdata.org/dataset/hotosm_chn_waterways" target="_blank" rel="noopener">⑥ 中国水道公开 GIS 数据集（OpenStreetMap 整理，文件较大）</a></div>
+      <div class="tools"><button class="btn" id="editToggle">编辑河道资料</button><button class="btn" id="geojsonBtn">导出已核验河线</button><button class="btn" id="resetBtn">恢复资料列表</button><button class="btn" id="boundaryBtn">行政边界说明</button></div><div class="tools"><span class="detail-sub">请分别导入政府公开或授权的 GeoJSON。GeoJSON 坐标必须是标准经度、纬度顺序；系统按图层类型分别显示。</span></div>
+      <div id="editorArea" class="hidden" style="margin-top:12px"><div class="detail-sub" style="margin-bottom:8px">可修改名称、说明和线路坐标。坐标格式为 [纬度, 经度]，修改后点击“应用数据”。请保留 JSON 格式。</div><textarea class="editor" id="editor"></textarea><div class="editor-actions"><button class="btn primary" id="applyBtn">应用数据</button><button class="btn" id="cancelEditBtn">取消</button></div></div>
+    </section>
+  </aside>
+</main>
+</div>
+<div id="toast" class="toast hidden" role="status"></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script>
+(function(){
+const INITIAL_RIVERS = [
+ {id:'tiansha',name:'天沙河',area:'鹤山市—蓬江区—新会区',basin:'潭江流域东部 / 江门水道',length:'干流 49.00 km（市水利局河湖概况）',flow:['天沙河','江门水道','银洲湖 / 潭江下游','崖门口','南海'],note:'已核实的官方关系：天沙河分上、下两个出口汇入江门水道；江门水道向下游连接银洲湖。官方资料描述的是水系连通关系，不代表这里已经有精确中心线。',coords:[],color:'#00a99d',source:'江门市水利局《天沙河》河湖概况'},
+ {id:'shachong',name:'沙冲河',area:'潭江流域（具体河段待 GIS 校核）',basin:'潭江水系',length:'市级河湖长名录记载约 20 km',flow:['沙冲河','潭江水系','潭江下游','崖门口','南海'],note:'官方市级河湖长名单记载沙冲河长度约 20 km；2023 年河湖长制工作要点将其列为重点综合治理支流。精确河口、中心线和下游路径尚待官方 GIS 核实。',coords:[],color:'#368bd4',source:'江门市水利局市级河湖长名单；2023 年工作要点'},
+ {id:'gongyi',name:'公益水',area:'台山市公益镇一带',basin:'潭江流域',length:'公开环境功能区资料列有河道名录',flow:['公益水','潭江流域','潭江下游','崖门口','南海'],note:'官方水环境功能区资料将公益水列入潭江水系；市级治理文件也将其列为重点综合治理支流。精确中心线及汇入口未在本版绘制，避免以推测坐标代替实测数据。',coords:[],color:'#d16db5',source:'江门市生态环境局公开水环境资料；2023 年工作要点'},
+ {id:'zhenhai',name:'镇海水',area:'鹤山市—开平市',basin:'潭江最大支流之一',length:'市级河湖长名录含干流及部分支流，口径不同',flow:['镇海水','苍江 / 镇海水出口','潭江干流','潭江下游','崖门口'],note:'官方水利资料记载镇海水位于潭江中下游左岸，是潭江最大的支流；在交流渡分流，东支称苍江，相关出口汇入潭江。地图仍需导入正式 GIS 河线。',coords:[],color:'#ed9a35',source:'江门市水利局《镇海水》河湖概况'},
+ {id:'xinqiao',name:'新桥水',area:'鹤山市—开平市',basin:'潭江水系',length:'市级河湖长名录记载约 30 km',flow:['新桥水','潭江水系','潭江下游','崖门口','南海'],note:'市级河湖长名录记载新桥水长度约 30 km，并将其列为市级河流；精确河道中心线及下游汇入口需要导入官方或授权 GIS 数据核实。',coords:[],color:'#7869d7',source:'江门市水利局市级河湖长名单'},
+ {id:'taiping',name:'太平河',area:'具体行政区与河口待核实',basin:'潭江流域重点治理支流（按 2023 年工作要点）',length:'未知',flow:['太平河','汇入口待核实','潭江下游关系待核实','海域待核实'],note:'官方 2023 年河湖长制工作要点将太平河列为七条重点综合治理支流之一。本版不推断其具体入潭江位置或最终入海路线；需要河道名录、河长公示或 GIS 中心线进一步确认。',coords:[],color:'#c58a36',source:'江门市水利局《江门市2023年实施河湖长制工作要点'},
+ {id:'changan',name:'长安河',area:'恩平市相关水系（待空间数据校核）',basin:'潭江流域关系待进一步核实',length:'未知',flow:['长安河','汇入口待核实','潭江下游关系待核实','海域待核实'],note:'官方 2023 年河湖长制工作要点将长安河列为七条重点综合治理支流之一。当前尚未用可核验的官方空间数据确认其全线及最终入海路径，因此不显示推测坐标或长度。',coords:[],color:'#cf5964',source:'江门市水利局《江门市2023年实施河湖长制工作要点'}
+];
+let rivers=JSON.parse(JSON.stringify(INITIAL_RIVERS)), selected='tiansha', lines={}, markers={}, showRivers=true, editorOpen=false;
+const map=L.map('map',{zoomControl:true,preferCanvas:true}).setView([22.52,112.68],7.4);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> 贡献者'}).addTo(map);
+const importedLayers={rivers:L.layerGroup().addTo(map),boundaries:L.layerGroup().addTo(map),mouths:L.layerGroup().addTo(map)};
+const importedCounts={rivers:0,boundaries:0,mouths:0};
+function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.remove('hidden');clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.classList.add('hidden'),3200);}
+function makeRiverLayers(){
+ Object.values(lines).forEach(l=>map.removeLayer(l));lines={};Object.values(markers).forEach(m=>map.removeLayer(m));markers={};
+ rivers.forEach(r=>{
+  if(!Array.isArray(r.coords)||r.coords.length<2)return;
+  const ll=r.coords.map(c=>[Number(c[0]),Number(c[1])]);
+  const p=L.polyline(ll,{color:r.color||'#00a99d',weight:r.id===selected?6:3.5,opacity:r.id===selected?1:.78,lineCap:'round',lineJoin:'round'});
+  p.bindTooltip(r.name,{sticky:true,direction:'top'}).bindPopup('<b>'+escapeHtml(r.name)+'</b><br>'+escapeHtml(r.basin)+'<br><small>来源与精度请按编辑资料核验。</small>');
+  p.on('click',()=>selectRiver(r.id));lines[r.id]=p;
+  const end=ll[ll.length-1],m=L.circleMarker(end,{radius:r.id===selected?6:4,color:'#fff',weight:2,fillColor:r.color||'#00a99d',fillOpacity:1});
+  m.bindTooltip(r.name,{sticky:true});m.on('click',()=>selectRiver(r.id));markers[r.id]=m;
+ });updateLayerVisibility();
+}
+function updateLayerVisibility(){Object.keys(lines).forEach(id=>{if(showRivers){lines[id].addTo(map);markers[id].addTo(map);}else{map.removeLayer(lines[id]);map.removeLayer(markers[id]);}});}
+function renderList(){const box=document.getElementById('riverList');box.innerHTML='';rivers.forEach(r=>{const b=document.createElement('button');b.className='river'+(r.id===selected?' active':'');b.innerHTML='<span class="river-dot" style="background:'+escapeHtml(r.color||'#00a99d')+'"></span><span class="river-info"><span class="river-name">'+escapeHtml(r.name)+'</span><span class="river-sub">'+escapeHtml(r.area)+' · '+escapeHtml(r.basin)+'</span></span><span class="chevron">›</span>';b.addEventListener('click',()=>selectRiver(r.id));box.appendChild(b);});document.getElementById('activeCount').textContent=rivers.length+' 条可选';}
+function renderDetail(){const r=rivers.find(x=>x.id===selected)||rivers[0];if(!r)return;document.getElementById('detailTitle').textContent=r.name;document.getElementById('detailSub').textContent=r.area+' · '+r.basin+' · '+r.length;document.getElementById('detailNote').textContent=r.note;const f=document.getElementById('routeFlow');f.innerHTML='';r.flow.forEach((s,i)=>{const chip=document.createElement('span');chip.className='flow-chip';chip.textContent=s;f.appendChild(chip);if(i<r.flow.length-1){const a=document.createElement('span');a.className='flow-arrow';a.textContent='→';f.appendChild(a);}});}
+function selectRiver(id){selected=id;renderList();renderDetail();makeRiverLayers();const r=rivers.find(x=>x.id===id);if(r&&r.coords&&r.coords.length>1){map.fitBounds(L.latLngBounds(r.coords.map(c=>[c[0],c[1]])).pad(.75),{maxZoom:10,animate:true});}}
+function readGeoJSON(file,kind){
+ return file.text().then(txt=>{
+  const data=JSON.parse(txt);if(!data||!['FeatureCollection','Feature'].includes(data.type))throw new Error('文件必须是 GeoJSON Feature 或 FeatureCollection。');
+  const target=importedLayers[kind];target.clearLayers();
+  const style=feature=>{
+   const props=feature.properties||{},name=props.name||props.NAME||props.河流名称||props.名称||props.河道名||'';
+   if(kind==='boundaries')return {color:'#455d73',weight:2,opacity:.95,fillColor:'#7b9bb1',fillOpacity:.04,dashArray:'5 4'};
+   const river=rivers.find(r=>r.name===name);
+   return {color:river?river.color:(kind==='mouths'?'#e5a23e':'#168bb7'),weight:river?4:3,opacity:.95};
+  };
+  const layer=L.geoJSON(data,{
+   style:style,
+   pointToLayer:(feature,ll)=>L.circleMarker(ll,{radius:kind==='mouths'?8:6,color:'#fff',weight:2,fillColor:kind==='mouths'?'#e5a23e':'#168bb7',fillOpacity:1}),
+   onEachFeature:(feature,l)=>{
+    const props=feature.properties||{},label=props.name||props.NAME||props.河流名称||props.名称||props.河道名||props.区县名||props.行政区||props.label||'导入要素';
+    if(document.getElementById('toggleRiverLabels').checked)l.bindTooltip(String(label),{sticky:true});
+    l.bindPopup('<b>'+escapeHtml(label)+'</b><br>图层：'+({rivers:'河道中心线',boundaries:'行政边界',mouths:'入海口/汇入口'}[kind])+'<br>文件：'+escapeHtml(file.name)+'<br><small>请确认发布机构、数据日期、坐标系和属性字段。</small>');
+   }
+  });
+  layer.addTo(target);importedCounts[kind]=layer.getLayers().length;
+  if(layer.getLayers().length){try{const bounds=layer.getBounds();if(bounds.isValid())map.fitBounds(bounds,{padding:[20,20],maxZoom:11});}catch(_){}}
+  toast('已导入'+({rivers:'河道中心线',boundaries:'行政边界',mouths:'河口点位'}[kind])+'：'+importedCounts[kind]+' 个要素。请核验数据来源与坐标系。');
+ });
+}
+document.getElementById('provinceBtn').onclick=()=>{map.setView([23.25,113.38],6.25,{animate:true});toast('已切换到广东省总览');};
+document.getElementById('jiangmenBtn').onclick=()=>{map.fitBounds([[21.99,112.10],[22.82,113.20]],{padding:[15,15],animate:true});toast('已定位江门市及周边水系');};
+document.getElementById('allBtn').onclick=()=>{showRivers=true;makeRiverLayers();map.fitBounds([[22.12,112.15],[22.79,113.17]],{padding:[20,20],animate:true});toast('仅显示已导入或手动核验的河线；没有数据时不会绘制虚构线路。');};
+document.getElementById('hideBtn').onclick=()=>{showRivers=false;updateLayerVisibility();toast('已隐藏当前编辑数据中的河道线');};
+
+document.getElementById('loadOsmBtn').onclick=async()=>{
+ const btn=document.getElementById('loadOsmBtn'),old=btn.textContent;btn.disabled=true;btn.textContent='检索中…';
+ const bbox='21.9,112.0,22.95,113.35';
+ const nameRe='天沙河|沙冲河|公益水|镇海水|新桥水|太平河|长安河|潭江|江门水道|崖门水道|银洲湖|西江';
+ const query='[out:json][timeout:45];(way["waterway"]["name"~"'+nameRe+'"]('+bbox+'););out geom;';
+ const endpoints=['https://overpass-api.de/api/interpreter','https://overpass.kumi.systems/api/interpreter'];
+ let result=null,lastErr='';
+ try{
+  for(const endpoint of endpoints){
+   try{
+    const response=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'},body:'data='+encodeURIComponent(query)});
+    if(!response.ok)throw new Error('HTTP '+response.status);
+    result=await response.json();break;
+   }catch(err){lastErr=err.message;}
+  }
+  if(!result)throw new Error(lastErr||'公开 Overpass 服务暂时不可用');
+  const features=(result.elements||[]).filter(e=>e.type==='way'&&Array.isArray(e.geometry)&&e.geometry.length>1).map(e=>({
+   type:'Feature',
+   properties:{name:(e.tags&&e.tags.name)||'未命名河道',waterway:(e.tags&&e.tags.waterway)||'',source:'OpenStreetMap / Overpass API',osm_id:e.id,verification:'公开众包地图数据，非政府测绘成果'},
+   geometry:{type:'LineString',coordinates:e.geometry.map(pt=>[pt.lon,pt.lat])}
+  }));
+  if(!features.length)throw new Error('查询成功但没有找到名称匹配的河道要素；这不代表当地没有河流。可改用官方/授权 GeoJSON 导入。');
+  importedLayers.rivers.clearLayers();
+  const layer=L.geoJSON({type:'FeatureCollection',features},{
+   style:f=>{const n=(f.properties.name||'').replace(/\s/g,'');const r=rivers.find(x=>x.name===n);return {color:r?r.color:((/潭江|江门水道|崖门|银洲湖|西江/.test(n))?'#1c79be':'#168bb7'),weight:r?4:2.8,opacity:.92};},
+   onEachFeature:(f,l)=>{const p=f.properties||{};l.bindTooltip(p.name,{sticky:true});l.bindPopup('<b>'+escapeHtml(p.name)+'</b><br>类型：'+escapeHtml(p.waterway||'未知')+'<br>来源：OpenStreetMap<br>OSM way ID：'+escapeHtml(p.osm_id)+'<br><small>这是公开众包地图数据，须与水利部门资料核验后才能作为正式成果。</small>');}
+  });
+  layer.addTo(importedLayers.rivers);importedCounts.rivers=features.length;
+  if(document.getElementById('toggleRiverLabels').checked)layer.eachLayer(l=>{if(l.feature&&l.feature.properties.name)l.bindTooltip(l.feature.properties.name,{sticky:true});});
+  try{const b=layer.getBounds();if(b.isValid())map.fitBounds(b.pad(.12),{maxZoom:11});}catch(_){}
+  toast('检索到 '+features.length+' 条公开河道要素。请核验名称、完整性与入海关系。');
+ }catch(err){
+  toast('在线 GIS 检索未成功：'+err.message+'。平台仍可导入本地 GeoJSON。');
+ }finally{btn.disabled=false;btn.textContent=old;}
+};
+
+document.getElementById('importRiverBtn').onclick=()=>document.getElementById('riverFile').click();
+document.getElementById('importBoundaryBtn').onclick=()=>document.getElementById('boundaryFile').click();
+document.getElementById('importMouthBtn').onclick=()=>document.getElementById('mouthFile').click();
+document.getElementById('riverFile').addEventListener('change',e=>{const f=e.target.files&&e.target.files[0];if(f)readGeoJSON(f,'rivers').catch(err=>toast('导入失败：'+err.message));e.target.value='';});
+document.getElementById('boundaryFile').addEventListener('change',e=>{const f=e.target.files&&e.target.files[0];if(f)readGeoJSON(f,'boundaries').catch(err=>toast('导入失败：'+err.message));e.target.value='';});
+document.getElementById('mouthFile').addEventListener('change',e=>{const f=e.target.files&&e.target.files[0];if(f)readGeoJSON(f,'mouths').catch(err=>toast('导入失败：'+err.message));e.target.value='';});
+document.getElementById('clearImportedBtn').onclick=()=>{Object.values(importedLayers).forEach(l=>l.clearLayers());Object.keys(importedCounts).forEach(k=>importedCounts[k]=0);toast('已清除全部导入图层');};
+document.getElementById('toggleRiverLabels').onchange=e=>{Object.values(importedLayers).forEach(group=>group.eachLayer(layer=>layer.eachLayer&&layer.eachLayer(child=>{if(e.target.checked){const p=child.feature&&child.feature.properties||{},label=p.name||p.NAME||p.河流名称||p.名称||p.河道名||p.区县名||p.行政区||p.label;if(label)child.bindTooltip(String(label),{sticky:true});}else child.unbindTooltip();})));};
+document.getElementById('toggleBoundaries').onchange=e=>{if(e.target.checked)importedLayers.boundaries.addTo(map);else map.removeLayer(importedLayers.boundaries);};
+document.getElementById('toggleMouths').onchange=e=>{if(e.target.checked)importedLayers.mouths.addTo(map);else map.removeLayer(importedLayers.mouths);};
+document.getElementById('boundaryBtn').onclick=()=>toast('行政区边界请导入政府公开或授权的 GeoJSON 面/线文件；本版不会凭空生成区县边界坐标。');
+document.getElementById('editToggle').onclick=()=>{editorOpen=!editorOpen;document.getElementById('editorArea').classList.toggle('hidden',!editorOpen);if(editorOpen)document.getElementById('editor').value=JSON.stringify(rivers,null,2);};
+document.getElementById('cancelEditBtn').onclick=()=>{editorOpen=false;document.getElementById('editorArea').classList.add('hidden');};
+document.getElementById('applyBtn').onclick=()=>{try{const parsed=JSON.parse(document.getElementById('editor').value);if(!Array.isArray(parsed)||!parsed.length)throw new Error('数据必须是河道数组');parsed.forEach(r=>{if(!r.id||!r.name||!Array.isArray(r.coords))throw new Error('每条河道需有 id、name 和 coords；未核验线路请保留 []');r.coords.forEach(c=>{if(!Array.isArray(c)||c.length!==2||!Number.isFinite(Number(c[0]))||!Number.isFinite(Number(c[1])))throw new Error('河线坐标格式应为 [纬度, 经度] 数字数组');});});rivers=parsed;selected=rivers.some(r=>r.id===selected)?selected:rivers[0].id;renderList();renderDetail();makeRiverLayers();editorOpen=false;document.getElementById('editorArea').classList.add('hidden');toast('河道资料已应用（仅当前页面有效）');}catch(e){toast('无法应用：'+e.message);}};
+document.getElementById('resetBtn').onclick=()=>{rivers=JSON.parse(JSON.stringify(INITIAL_RIVERS));selected='tiansha';renderList();renderDetail();makeRiverLayers();toast('已恢复官方资料摘要列表');};
+document.getElementById('geojsonBtn').onclick=()=>{const features=rivers.filter(r=>Array.isArray(r.coords)&&r.coords.length>1).map(r=>({type:'Feature',properties:{id:r.id,name:r.name,area:r.area,basin:r.basin,source:r.source||'用户编辑数据，需核验',note:r.note},geometry:{type:'LineString',coordinates:r.coords.map(c=>[Number(c[1]),Number(c[0])])}}));if(!features.length){toast('当前没有河线数据可导出；请先导入官方 GIS 或编辑坐标。');return;}const blob=new Blob([JSON.stringify({type:'FeatureCollection',name:'江门七河已核验河线（需确认数据来源）',features},null,2)],{type:'application/geo+json;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='江门七河河线.geojson';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);toast('已导出河线 GeoJSON');};
+renderList();renderDetail();makeRiverLayers();setTimeout(()=>map.invalidateSize(),350);window.addEventListener('resize',()=>map.invalidateSize());
+})();
+</script>
+</body>
+</html>
